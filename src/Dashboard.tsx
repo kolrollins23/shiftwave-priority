@@ -7,6 +7,7 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
+  DragEndEvent,
 } from '@dnd-kit/core'
 import {
   arrayMove,
@@ -24,6 +25,7 @@ interface Entry {
 
 export default function Dashboard() {
   const [entries, setEntries] = useState<Entry[]>([])
+  const [trashId, setTrashId] = useState('trash-zone')
 
   const fetchEntries = async () => {
     const { data, error } = await supabase
@@ -33,7 +35,6 @@ export default function Dashboard() {
     if (error) {
       console.error('Error fetching entries:', error)
     } else {
-      // ✅ Sort descending by score
       const sorted = data.sort((a, b) => (b.priority_score || 0) - (a.priority_score || 0))
       setEntries(sorted)
     }
@@ -50,10 +51,25 @@ export default function Dashboard() {
     })
   )
 
-  const handleDragEnd = (event: any) => {
+  const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event
 
-    if (active.id !== over.id) {
+    if (!over) return
+
+    if (over.id === trashId) {
+      const entry = entries.find(e => e.id === active.id)
+      const confirmed = window.confirm(`Are you sure you want to delete ${entry?.name} from the priority list?`)
+
+      if (confirmed && entry) {
+        const { error } = await supabase.from('priority_queue').delete().eq('id', entry.id)
+        if (error) {
+          console.error('Error deleting entry:', error)
+          alert('Error deleting entry')
+        } else {
+          setEntries(entries.filter(e => e.id !== entry.id))
+        }
+      }
+    } else if (active.id !== over.id) {
       const oldIndex = entries.findIndex(e => e.id === active.id)
       const newIndex = entries.findIndex(e => e.id === over.id)
       const newOrder = arrayMove(entries, oldIndex, newIndex)
@@ -75,6 +91,23 @@ export default function Dashboard() {
             />
           ))}
         </SortableContext>
+
+        {/* Trash Zone */}
+        <div
+          id={trashId}
+          style={{
+            marginTop: '3rem',
+            padding: '1rem',
+            border: '2px dashed red',
+            borderRadius: '8px',
+            textAlign: 'center',
+            backgroundColor: '#ffe5e5',
+            color: 'red',
+            fontWeight: 'bold',
+          }}
+        >
+          🗑️ Drag here to delete
+        </div>
       </DndContext>
     </div>
   )

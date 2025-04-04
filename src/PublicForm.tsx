@@ -8,7 +8,7 @@ export default function PublicForm() {
 
   const onSubmit = async (data: any) => {
     try {
-      const res = await fetch('http://localhost:8000/score', {
+      const res = await fetch('https://shiftwave-backend.onrender.com', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),

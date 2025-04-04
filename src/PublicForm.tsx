@@ -8,7 +8,8 @@ export default function PublicForm() {
 
   const onSubmit = async (data: any) => {
     try {
-      const res = await fetch('https://shiftwave-backend.onrender.com', {
+      // ✅ Send data to your backend scoring API
+      const res = await fetch('https://shiftwave-backend.onrender.com/score', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
@@ -16,16 +17,24 @@ export default function PublicForm() {
 
       const result = await res.json()
       const score = result.priority_score
+      console.log("Scored priority:", score)
 
-      await supabase.from('priority_queue').insert({
+      // ✅ Save to Supabase with score included
+      const { error } = await supabase.from('priority_queue').insert({
         ...data,
         injured: data.injured === 'yes',
         priority_score: score,
       })
 
-      setSubmitted(true)
-    } catch (err) {
-      console.error('Submission error:', err)
+      if (error) {
+        console.error('Supabase insert error:', error)
+        alert('Error saving to database')
+      } else {
+        setSubmitted(true)
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error)
+      alert('Failed to submit form')
     }
   }
 

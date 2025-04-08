@@ -1,5 +1,3 @@
-// App.tsx
-
 import PublicForm from './PublicForm'
 import AdminDashboard from './AdminDashboard'
 

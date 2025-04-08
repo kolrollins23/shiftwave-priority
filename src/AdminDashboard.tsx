@@ -27,7 +27,6 @@ export default function AdminDashboard() {
   const [isAuthorized, setIsAuthorized] = useState(false)
   const [input, setInput] = useState('')
   const [entries, setEntries] = useState<Entry[]>([])
-  const [trashId, setTrashId] = useState('trash-zone')
 
   // Login function for admin authentication
   const handleLogin = () => {
@@ -70,7 +69,7 @@ export default function AdminDashboard() {
 
     if (!over) return
 
-    if (over.id === trashId) {
+    if (over.id === 'trash-zone') {
       const entry = entries.find(e => e.id === active.id)
       const confirmed = window.confirm(`Are you sure you want to delete ${entry?.name} from the priority list?`)
 
@@ -125,7 +124,7 @@ export default function AdminDashboard() {
 
         {/* Trash Zone */}
         <div
-          id={trashId}
+          id="trash-zone"
           style={{
             marginTop: '3rem',
             padding: '1rem',

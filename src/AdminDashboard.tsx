@@ -153,6 +153,7 @@ export default function AdminDashboard() {
         {shippedEntries.map((entry) => (
           <div key={entry.id}>
             <strong>{entry.name}</strong> - {entry.priority_score}
+            <button onClick={() => handleMoveToShipped(entry)}>Move to Shipped</button>
           </div>
         ))}
       </div>

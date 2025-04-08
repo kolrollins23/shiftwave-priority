@@ -143,7 +143,7 @@ export default function AdminDashboard() {
               id={entry.id}
               name={entry.name}
               score={entry.priority_score}
-              description={entry.description}
+              description={entry.description} // Passing description to SortableItem
             />
           ))}
         </SortableContext>

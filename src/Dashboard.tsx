@@ -23,10 +23,21 @@ interface Entry {
   priority_score: number
 }
 
-export default function Dashboard() {
+export default function AdminDashboard() {
+  const [isAuthorized, setIsAuthorized] = useState(false)
+  const [input, setInput] = useState('')
   const [entries, setEntries] = useState<Entry[]>([])
-  const [trashId, setTrashId] = useState('trash-zone')
 
+  // Login function for admin authentication
+  const handleLogin = () => {
+    if (input === 'shiftwave') {
+      setIsAuthorized(true)
+    } else {
+      alert('Incorrect password')
+    }
+  }
+
+  // Fetch entries from Supabase
   const fetchEntries = async () => {
     const { data, error } = await supabase
       .from('priority_queue')
@@ -35,14 +46,15 @@ export default function Dashboard() {
     if (error) {
       console.error('Error fetching entries:', error)
     } else {
+      // Sort the entries by priority score in descending order
       const sorted = data.sort((a, b) => (b.priority_score || 0) - (a.priority_score || 0))
       setEntries(sorted)
     }
   }
 
   useEffect(() => {
-    fetchEntries()
-  }, [])
+    if (isAuthorized) fetchEntries()
+  }, [isAuthorized])
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -51,12 +63,13 @@ export default function Dashboard() {
     })
   )
 
+  // Handle drag-and-drop and deletion in the trash zone
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event
 
     if (!over) return
 
-    if (over.id === trashId) {
+    if (over.id === 'trash-zone') {
       const entry = entries.find(e => e.id === active.id)
       const confirmed = window.confirm(`Are you sure you want to delete ${entry?.name} from the priority list?`)
 
@@ -77,8 +90,25 @@ export default function Dashboard() {
     }
   }
 
+  if (!isAuthorized) {
+    return (
+      <div style={{ padding: '2rem', maxWidth: '400px', margin: '0 auto' }}>
+        <h2>🔐 Shiftwave Admin Login</h2>
+        <input
+          type="password"
+          placeholder="Enter admin password"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem' }}
+        />
+        <button onClick={handleLogin}>Login</button>
+      </div>
+    )
+  }
+
   return (
     <div style={{ padding: '2rem' }}>
+      <h1>🛠 Shiftwave Admin Dashboard</h1>
       <h2>📋 Priority Dashboard</h2>
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={entries.map((entry) => entry.id)} strategy={verticalListSortingStrategy}>
@@ -94,7 +124,7 @@ export default function Dashboard() {
 
         {/* Trash Zone */}
         <div
-          id={trashId}
+          id="trash-zone"
           style={{
             marginTop: '3rem',
             padding: '1rem',

@@ -1,15 +1,19 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 
+interface SortableItemProps {
+  id: string
+  name: string
+  score: number
+  description: string  // Add description as a prop
+}
+
 export default function SortableItem({
   id,
   name,
   score,
-}: {
-  id: string
-  name: string
-  score: number
-}) {
+  description
+}: SortableItemProps) {
   const {
     attributes,
     listeners,
@@ -33,7 +37,11 @@ export default function SortableItem({
 
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <strong>{name}</strong> — Score: {score}
+      <strong style={{ fontFamily: 'Times New Roman', fontWeight: 'bold' }}>
+        {name}
+      </strong>
+      <p>Score: {score}</p>
+      <p><strong>Description:</strong> {description}</p> {/* Display the description */}
     </div>
   )
 }

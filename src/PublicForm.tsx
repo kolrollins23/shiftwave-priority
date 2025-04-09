@@ -39,7 +39,8 @@ export default function PublicForm() {
       } else {
         setSubmitted(true)
       }
-    } catch (error) {
+    } catch (err) {
+      const error = err as Error // Explicitly cast to Error
       console.error('Error submitting form:', error)
       alert('Failed to submit form: ' + error.message)
     }

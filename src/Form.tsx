@@ -36,7 +36,8 @@ export default function IntakeForm() {
       } else {
         alert(`Your priority score is: ${score}`)
       }
-    } catch (error) {
+    } catch (err) {
+      const error = err as Error // Explicitly cast to Error
       console.error('Error submitting form:', error)
       alert('Failed to submit form: ' + error.message)
     }

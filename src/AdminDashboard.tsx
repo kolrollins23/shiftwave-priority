@@ -29,6 +29,7 @@ export default function AdminDashboard() {
   const [input, setInput] = useState('')
   const [entries, setEntries] = useState<Entry[]>([])
   const [shippedEntries, setShippedEntries] = useState<Entry[]>([])
+  const [isShippedCollapsed, setIsShippedCollapsed] = useState(false) // Collapsible state for shipped items
 
   // Login function for admin authentication
   const handleLogin = () => {
@@ -97,6 +98,11 @@ export default function AdminDashboard() {
     setEntries((prevEntries) => prevEntries.filter((e) => e.id !== entry.id))
   }
 
+  // Toggle shipped items visibility
+  const toggleShippedCollapse = () => {
+    setIsShippedCollapsed(!isShippedCollapsed)
+  }
+
   if (!isAuthorized) {
     return (
       <div style={{ padding: '2rem', maxWidth: '400px', margin: '0 auto' }}>
@@ -146,7 +152,7 @@ export default function AdminDashboard() {
               id={entry.id}
               name={entry.name}
               score={entry.priority_score}
-              description={entry.description} // Pass description to SortableItem
+              description={entry.description} // Display description
             />
           ))}
         </SortableContext>
@@ -170,27 +176,28 @@ export default function AdminDashboard() {
         </div>
       </DndContext>
 
-      <h2 style={{ fontWeight: 'bold' }}>Shipped Items</h2>
-      <div>
-        {shippedEntries.map((entry) => (
-          <div key={entry.id}>
-            <strong>{entry.name}</strong> — {entry.priority_score}
-            <button
-              onClick={() => handleMoveToShipped(entry)}
+      <h2 style={{ fontWeight: 'bold', cursor: 'pointer' }} onClick={toggleShippedCollapse}>
+        Shipped Items {isShippedCollapsed ? '▼' : '▲'}
+      </h2>
+      {!isShippedCollapsed && (
+        <div>
+          {shippedEntries.map((entry) => (
+            <div
+              key={entry.id}
               style={{
                 padding: '0.5rem',
-                marginLeft: '1rem',
-                backgroundColor: '#28a745',
-                color: 'white',
-                border: 'none',
-                cursor: 'pointer',
+                marginBottom: '0.5rem',
+                border: '1px solid #ccc',
+                borderRadius: '4px',
+                backgroundColor: '#f9f9f9',
               }}
             >
-              Move to Shipped
-            </button>
-          </div>
-        ))}
-      </div>
+              <strong>{entry.name}</strong> — {entry.priority_score}
+              <p style={{ margin: '0.5rem 0', fontStyle: 'italic' }}>{entry.description}</p>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

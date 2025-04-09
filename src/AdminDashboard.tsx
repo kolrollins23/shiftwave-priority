@@ -135,9 +135,9 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div style={{ padding: '2rem' }}>
-      <h1 style={{ fontFamily: 'Times New Roman', fontWeight: 'bold' }}>Shiftwave Admin Dashboard</h1>
-      <h2 style={{ fontFamily: 'Times New Roman', fontWeight: 'bold' }}>Priority Dashboard</h2>
+    <div style={{ padding: '2rem', fontFamily: 'Times New Roman' }}>
+      <h1 style={{ fontWeight: 'bold' }}>Shiftwave Admin Dashboard</h1>
+      <h2 style={{ fontWeight: 'bold' }}>Priority Dashboard</h2>
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={entries.map((entry) => entry.id)} strategy={verticalListSortingStrategy}>
           {entries.map((entry) => (
@@ -170,24 +170,11 @@ export default function AdminDashboard() {
         </div>
       </DndContext>
 
-      <h2 style={{ fontFamily: 'Times New Roman', fontWeight: 'bold' }}>Shipped Items</h2>
+      <h2 style={{ fontWeight: 'bold' }}>Shipped Items</h2>
       <div>
         {shippedEntries.map((entry) => (
           <div key={entry.id}>
             <strong>{entry.name}</strong> — {entry.priority_score}
-            <button
-              onClick={() => handleMoveToShipped(entry)}
-              style={{
-                padding: '0.5rem',
-                marginLeft: '1rem',
-                backgroundColor: '#28a745',
-                color: 'white',
-                border: 'none',
-                cursor: 'pointer',
-              }}
-            >
-              Move to Shipped
-            </button>
           </div>
         ))}
       </div>

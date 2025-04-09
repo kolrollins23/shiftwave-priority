@@ -6,31 +6,39 @@ export default function IntakeForm() {
 
   const onSubmit = async (data: any) => {
     try {
+      console.log('Submitting form data:', data)
+
       const res = await fetch('http://localhost:8000/score', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       })
-  
+
+      if (!res.ok) {
+        const errorText = await res.text()
+        throw new Error(`API Error: ${res.status} ${res.statusText} - ${errorText}`)
+      }
+
       const result = await res.json()
       const score = result.priority_score
-  
+      console.log('Scored priority:', score)
+
       // Save to Supabase
       const { error } = await supabase.from('priority_queue').insert({
         ...data,
         injured: data.injured === 'yes',
         priority_score: score,
       })
-  
+
       if (error) {
         console.error('Supabase insert error:', error)
-        alert('Error saving to database')
+        alert('Error saving to database: ' + error.message)
       } else {
         alert(`Your priority score is: ${score}`)
       }
     } catch (error) {
       console.error('Error submitting form:', error)
-      alert('Failed to submit form')
+      alert('Failed to submit form: ' + error.message)
     }
   }
 

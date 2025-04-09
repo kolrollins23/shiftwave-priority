@@ -17,9 +17,9 @@ export default function PublicForm() {
         body: JSON.stringify(data),
       })
 
-      console.log('API Response:', res)
       if (!res.ok) {
-        throw new Error(`API Error: ${res.status} ${res.statusText}`)
+        const errorText = await res.text()
+        throw new Error(`API Error: ${res.status} ${res.statusText} - ${errorText}`)
       }
 
       const result = await res.json()
@@ -35,13 +35,13 @@ export default function PublicForm() {
 
       if (error) {
         console.error('Supabase insert error:', error)
-        alert('Error saving to database')
+        alert('Error saving to database: ' + error.message)
       } else {
         setSubmitted(true)
       }
     } catch (error) {
       console.error('Error submitting form:', error)
-      alert('Failed to submit form')
+      alert('Failed to submit form: ' + error.message)
     }
   }
 

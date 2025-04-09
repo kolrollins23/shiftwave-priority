@@ -28,7 +28,7 @@ export default function AdminDashboard() {
   const [isAuthorized, setIsAuthorized] = useState(false)
   const [input, setInput] = useState('')
   const [entries, setEntries] = useState<Entry[]>([])
-  const [shippedEntries, setShippedEntries] = useState<Entry[]>([]) // Manage shipped entries
+  const [shippedEntries, setShippedEntries] = useState<Entry[]>([])
 
   // Login function for admin authentication
   const handleLogin = () => {
@@ -100,23 +100,44 @@ export default function AdminDashboard() {
   if (!isAuthorized) {
     return (
       <div style={{ padding: '2rem', maxWidth: '400px', margin: '0 auto' }}>
-        <h2>🔐 Shiftwave Admin Login</h2>
+        <h2 style={{ fontFamily: 'Times New Roman', fontWeight: 'bold' }}>Shiftwave Admin Login</h2>
         <input
           type="password"
           placeholder="Enter admin password"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem' }}
+          style={{
+            width: '100%',
+            padding: '0.5rem',
+            marginBottom: '1rem',
+            fontFamily: 'Times New Roman',
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              handleLogin()
+            }
+          }}
         />
-        <button onClick={handleLogin}>Login</button>
+        <button
+          onClick={handleLogin}
+          style={{
+            padding: '0.5rem',
+            backgroundColor: '#007BFF',
+            color: 'white',
+            border: 'none',
+            cursor: 'pointer',
+          }}
+        >
+          Login
+        </button>
       </div>
     )
   }
 
   return (
     <div style={{ padding: '2rem' }}>
-      <h1>🛠 Shiftwave Admin Dashboard</h1>
-      <h2>📋 Priority Dashboard</h2>
+      <h1 style={{ fontFamily: 'Times New Roman', fontWeight: 'bold' }}>Shiftwave Admin Dashboard</h1>
+      <h2 style={{ fontFamily: 'Times New Roman', fontWeight: 'bold' }}>Priority Dashboard</h2>
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={entries.map((entry) => entry.id)} strategy={verticalListSortingStrategy}>
           {entries.map((entry) => (
@@ -142,18 +163,18 @@ export default function AdminDashboard() {
             backgroundColor: '#ffe5e5',
             color: 'red',
             fontWeight: 'bold',
+            fontFamily: 'Times New Roman',
           }}
         >
-          🗑️ Drag here to delete
+          Drag here to delete
         </div>
       </DndContext>
 
-      <h2>📦 Shipped Items</h2>
+      <h2 style={{ fontFamily: 'Times New Roman', fontWeight: 'bold' }}>Shipped Items</h2>
       <div>
         {shippedEntries.map((entry) => (
           <div key={entry.id}>
-            <strong>{entry.name}</strong> - {entry.priority_score}
-            <button onClick={() => handleMoveToShipped(entry)}>Move to Shipped</button>
+            <strong>{entry.name}</strong> — {entry.priority_score}
           </div>
         ))}
       </div>

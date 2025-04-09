@@ -175,6 +175,19 @@ export default function AdminDashboard() {
         {shippedEntries.map((entry) => (
           <div key={entry.id}>
             <strong>{entry.name}</strong> — {entry.priority_score}
+            <button
+              onClick={() => handleMoveToShipped(entry)}
+              style={{
+                padding: '0.5rem',
+                marginLeft: '1rem',
+                backgroundColor: '#28a745',
+                color: 'white',
+                border: 'none',
+                cursor: 'pointer',
+              }}
+            >
+              Move to Shipped
+            </button>
           </div>
         ))}
       </div>

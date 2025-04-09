@@ -8,18 +8,25 @@ export default function PublicForm() {
 
   const onSubmit = async (data: any) => {
     try {
-      // ✅ Send data to your backend scoring API
+      console.log('Submitting form data:', data)
+
+      // Send data to your backend scoring API
       const res = await fetch('https://shiftwave-backend.onrender.com/score', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       })
 
+      console.log('API Response:', res)
+      if (!res.ok) {
+        throw new Error(`API Error: ${res.status} ${res.statusText}`)
+      }
+
       const result = await res.json()
       const score = result.priority_score
-      console.log("Scored priority:", score)
+      console.log('Scored priority:', score)
 
-      // ✅ Save to Supabase with score included
+      // Save to Supabase with score included
       const { error } = await supabase.from('priority_queue').insert({
         ...data,
         injured: data.injured === 'yes',

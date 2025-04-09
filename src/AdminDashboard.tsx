@@ -28,7 +28,7 @@ export default function AdminDashboard() {
   const [isAuthorized, setIsAuthorized] = useState(false)
   const [input, setInput] = useState('')
   const [entries, setEntries] = useState<Entry[]>([])
-  const [shippedEntries, setShippedEntries] = useState<Entry[]>([])
+  const [shippedEntries] = useState<Entry[]>([]) // Remove unused setShippedEntries
   const [isShippedCollapsed, setIsShippedCollapsed] = useState(false) // Collapsible state for shipped items
 
   // Login function for admin authentication

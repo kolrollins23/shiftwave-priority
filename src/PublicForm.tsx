@@ -1,6 +1,6 @@
 import { useForm } from 'react-hook-form'
 import { useState } from 'react'
-import { supabase } from './supabaseClient'
+import { supabase } from './supabaseClient' // Ensure this import is correct
 
 export default function PublicForm() {
   const { register, handleSubmit } = useForm()

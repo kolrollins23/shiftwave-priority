@@ -92,12 +92,6 @@ export default function AdminDashboard() {
     }
   }
 
-  // Handle moving entries to the "Shipped" section
-  const handleMoveToShipped = (entry: Entry) => {
-    setShippedEntries((prevEntries) => [...prevEntries, entry])
-    setEntries((prevEntries) => prevEntries.filter((e) => e.id !== entry.id))
-  }
-
   // Toggle shipped items visibility
   const toggleShippedCollapse = () => {
     setIsShippedCollapsed(!isShippedCollapsed)

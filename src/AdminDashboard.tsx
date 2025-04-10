@@ -44,7 +44,7 @@ export default function AdminDashboard() {
   const fetchEntries = async () => {
     const { data, error } = await supabase
       .from('priority_queue')
-      .select('id, name, priority_score, description')
+      .select('id, name, priority_score')
 
     if (error) {
       console.error('Error fetching entries:', error)

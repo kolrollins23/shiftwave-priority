@@ -21,7 +21,7 @@ interface Entry {
   id: string
   name: string
   priority_score: number
-  description: string
+  description?: string
 }
 
 export default function AdminDashboard() {

@@ -5,7 +5,7 @@ interface SortableItemProps {
   id: string
   name: string
   score: number
-  description: string  // Add description as a prop
+  description?: string  // Add description as a prop
 }
 
 export default function SortableItem({

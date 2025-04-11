@@ -16,7 +16,6 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import SortableItem from './SortableItem'
-const [isOverTrash, setIsOverTrash] = useState(false)
 
 interface Entry {
   id: string
@@ -142,20 +141,7 @@ export default function AdminDashboard() {
         {/* Left Column */}
         <div style={{ flex: 1 }}>
           <h2 style={{ fontWeight: 'bold' }}>Priority Rank</h2>
-          <DndContext
-  sensors={sensors}
-  collisionDetection={closestCenter}
-  onDragEnd={handleDragEnd}
-  onDragOver={({ over }) => {
-    if (over?.id === 'trash-zone') {
-      setIsOverTrash(true)
-    } else {
-      setIsOverTrash(false)
-    }
-  }}
-  onDragCancel={() => setIsOverTrash(false)}
-  onDragStart={() => setIsOverTrash(false)}
->
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext items={entries.map((entry) => entry.id)} strategy={verticalListSortingStrategy}>
               {entries.map((entry) => (
                 <SortableItem
@@ -200,23 +186,21 @@ export default function AdminDashboard() {
   
           {/* Trash Zone */}
           <div
-  id="trash-zone"
-  style={{
-    marginTop: '2rem',
-    padding: '1rem',
-    border: isOverTrash ? '3px solid red' : '2px dashed red',
-    borderRadius: '8px',
-    textAlign: 'center',
-    backgroundColor: isOverTrash ? '#ffcccc' : '#ffe5e5',
-    color: 'red',
-    fontWeight: 'bold',
-    fontFamily: 'Times New Roman',
-    transition: 'all 0.2s ease-in-out',
-  }}
->
-  Drag here to delete
-</div>
-
+            id="trash-zone"
+            style={{
+              marginTop: '2rem',
+              padding: '1rem',
+              border: '2px dashed red',
+              borderRadius: '8px',
+              textAlign: 'center',
+              backgroundColor: '#ffe5e5',
+              color: 'red',
+              fontWeight: 'bold',
+              fontFamily: 'Times New Roman',
+            }}
+          >
+            Drag here to delete
+          </div>
         </div>
       </div>
     </div>

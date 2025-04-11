@@ -133,65 +133,76 @@ export default function AdminDashboard() {
       </div>
     )
   }
-
+  
   return (
     <div style={{ padding: '2rem', fontFamily: 'Times New Roman' }}>
-      <h1 style={{ fontWeight: 'bold' }}>Shiftwave Admin Dashboard</h1>
-      <h2 style={{ fontWeight: 'bold' }}>Priority Dashboard</h2>
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <SortableContext items={entries.map((entry) => entry.id)} strategy={verticalListSortingStrategy}>
-          {entries.map((entry) => (
-            <SortableItem
-              key={entry.id}
-              id={entry.id}
-              name={entry.name}
-              score={entry.priority_score}
-              description={entry.description} // Display description
-            />
-          ))}
-        </SortableContext>
-
-        {/* Trash Zone */}
-        <div
-          id="trash-zone"
-          style={{
-            marginTop: '3rem',
-            padding: '1rem',
-            border: '2px dashed red',
-            borderRadius: '8px',
-            textAlign: 'center',
-            backgroundColor: '#ffe5e5',
-            color: 'red',
-            fontWeight: 'bold',
-            fontFamily: 'Times New Roman',
-          }}
-        >
-          Drag here to delete
+      <h1 style={{ fontWeight: 'bold', textAlign: 'center' }}>Shiftwave Admin Dashboard</h1>
+      <div style={{ display: 'flex', gap: '2rem', alignItems: 'flex-start' }}>
+        {/* Left Column */}
+        <div style={{ flex: 1 }}>
+          <h2 style={{ fontWeight: 'bold' }}>Priority Rank</h2>
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext items={entries.map((entry) => entry.id)} strategy={verticalListSortingStrategy}>
+              {entries.map((entry) => (
+                <SortableItem
+                  key={entry.id}
+                  id={entry.id}
+                  name={entry.name}
+                  score={entry.priority_score}
+                  description={entry.description}
+                />
+              ))}
+            </SortableContext>
+          </DndContext>
         </div>
-      </DndContext>
-
-      <h2 style={{ fontWeight: 'bold', cursor: 'pointer' }} onClick={toggleShippedCollapse}>
-        Shipped Items {isShippedCollapsed ? '▼' : '▲'}
-      </h2>
-      {!isShippedCollapsed && (
-        <div>
-          {shippedEntries.map((entry) => (
-            <div
-              key={entry.id}
-              style={{
-                padding: '0.5rem',
-                marginBottom: '0.5rem',
-                border: '1px solid #ccc',
-                borderRadius: '4px',
-                backgroundColor: '#f9f9f9',
-              }}
-            >
-              <strong>{entry.name}</strong> — {entry.priority_score}
-              <p style={{ margin: '0.5rem 0', fontStyle: 'italic' }}>{entry.description}</p>
+  
+        {/* Right Column */}
+        <div style={{ flex: 1 }}>
+          <h2
+            style={{ fontWeight: 'bold', cursor: 'pointer' }}
+            onClick={toggleShippedCollapse}
+          >
+            Shipped Items {isShippedCollapsed ? '▼' : '▲'}
+          </h2>
+          {!isShippedCollapsed && (
+            <div>
+              {shippedEntries.map((entry) => (
+                <div
+                  key={entry.id}
+                  style={{
+                    padding: '0.5rem',
+                    marginBottom: '0.5rem',
+                    border: '1px solid #ccc',
+                    borderRadius: '4px',
+                    backgroundColor: '#f9f9f9',
+                  }}
+                >
+                  <strong>{entry.name}</strong> — {entry.priority_score}
+                  <p style={{ margin: '0.5rem 0', fontStyle: 'italic' }}>{entry.description}</p>
+                </div>
+              ))}
             </div>
-          ))}
+          )}
+  
+          {/* Trash Zone */}
+          <div
+            id="trash-zone"
+            style={{
+              marginTop: '2rem',
+              padding: '1rem',
+              border: '2px dashed red',
+              borderRadius: '8px',
+              textAlign: 'center',
+              backgroundColor: '#ffe5e5',
+              color: 'red',
+              fontWeight: 'bold',
+              fontFamily: 'Times New Roman',
+            }}
+          >
+            Drag here to delete
+          </div>
         </div>
-      )}
+      </div>
     </div>
   )
-}
+  

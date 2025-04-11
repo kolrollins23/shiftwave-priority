@@ -16,7 +16,6 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import SortableItem from './SortableItem'
-const [isOverTrash, setIsOverTrash] = useState(false)
 
 interface Entry {
   id: string

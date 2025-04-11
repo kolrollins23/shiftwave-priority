@@ -16,6 +16,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import SortableItem from './SortableItem'
+const [isOverTrash, setIsOverTrash] = useState(false)
 
 interface Entry {
   id: string
@@ -28,10 +29,10 @@ export default function AdminDashboard() {
   const [isAuthorized, setIsAuthorized] = useState(false)
   const [input, setInput] = useState('')
   const [entries, setEntries] = useState<Entry[]>([])
-  const [shippedEntries] = useState<Entry[]>([])
-  const [isShippedCollapsed, setIsShippedCollapsed] = useState(false)
-  const [isOverTrash, setIsOverTrash] = useState(false)
+  const [shippedEntries] = useState<Entry[]>([]) // Remove unused setShippedEntries
+  const [isShippedCollapsed, setIsShippedCollapsed] = useState(false) // Collapsible state for shipped items
 
+  // Login function for admin authentication
   const handleLogin = () => {
     if (input === 'shiftwave') {
       setIsAuthorized(true)
@@ -40,10 +41,11 @@ export default function AdminDashboard() {
     }
   }
 
+  // Fetch entries from Supabase
   const fetchEntries = async () => {
     const { data, error } = await supabase
       .from('priority_queue')
-      .select('id, name, priority_score, description')
+      .select('id, name, priority_score')
 
     if (error) {
       console.error('Error fetching entries:', error)
@@ -64,15 +66,15 @@ export default function AdminDashboard() {
     })
   )
 
+  // Handle drag-and-drop and deletion in the trash zone
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event
-    setIsOverTrash(false)
 
     if (!over) return
 
     if (over.id === 'trash-zone') {
       const entry = entries.find(e => e.id === active.id)
-      const confirmed = window.confirm(`Are you sure you want to delete ${entry?.name}?`)
+      const confirmed = window.confirm(`Are you sure you want to delete ${entry?.name} from the priority list?`)
 
       if (confirmed && entry) {
         const { error } = await supabase.from('priority_queue').delete().eq('id', entry.id)
@@ -91,6 +93,7 @@ export default function AdminDashboard() {
     }
   }
 
+  // Toggle shipped items visibility
   const toggleShippedCollapse = () => {
     setIsShippedCollapsed(!isShippedCollapsed)
   }
@@ -111,7 +114,9 @@ export default function AdminDashboard() {
             fontFamily: 'Times New Roman',
           }}
           onKeyDown={(e) => {
-            if (e.key === 'Enter') handleLogin()
+            if (e.key === 'Enter') {
+              handleLogin()
+            }
           }}
         />
         <button
@@ -129,7 +134,7 @@ export default function AdminDashboard() {
       </div>
     )
   }
-
+  
   return (
     <div style={{ padding: '2rem', fontFamily: 'Times New Roman' }}>
       <h1 style={{ fontWeight: 'bold', textAlign: 'center' }}>Shiftwave Admin Dashboard</h1>
@@ -137,20 +142,7 @@ export default function AdminDashboard() {
         {/* Left Column */}
         <div style={{ flex: 1 }}>
           <h2 style={{ fontWeight: 'bold' }}>Priority Rank</h2>
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
-            onDragOver={({ over }) => {
-              if (over?.id === 'trash-zone') {
-                setIsOverTrash(true)
-              } else {
-                setIsOverTrash(false)
-              }
-            }}
-            onDragCancel={() => setIsOverTrash(false)}
-            onDragStart={() => setIsOverTrash(false)}
-          >
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext items={entries.map((entry) => entry.id)} strategy={verticalListSortingStrategy}>
               {entries.map((entry) => (
                 <SortableItem
@@ -164,14 +156,14 @@ export default function AdminDashboard() {
             </SortableContext>
           </DndContext>
         </div>
-
+  
         {/* Right Column */}
         <div style={{ flex: 1 }}>
           <h2
             style={{ fontWeight: 'bold', cursor: 'pointer' }}
             onClick={toggleShippedCollapse}
           >
-            Shipped Items {isShippedCollapsed ? '▼' : '▲'}
+            Shipped {isShippedCollapsed ? '▼' : '▲'}
           </h2>
           {!isShippedCollapsed && (
             <div>
@@ -192,21 +184,20 @@ export default function AdminDashboard() {
               ))}
             </div>
           )}
-
+  
           {/* Trash Zone */}
           <div
             id="trash-zone"
             style={{
               marginTop: '2rem',
               padding: '1rem',
-              border: isOverTrash ? '3px solid red' : '2px dashed red',
+              border: '2px dashed red',
               borderRadius: '8px',
               textAlign: 'center',
-              backgroundColor: isOverTrash ? '#ffcccc' : '#ffe5e5',
+              backgroundColor: '#ffe5e5',
               color: 'red',
               fontWeight: 'bold',
               fontFamily: 'Times New Roman',
-              transition: 'all 0.2s ease-in-out',
             }}
           >
             Drag here to delete

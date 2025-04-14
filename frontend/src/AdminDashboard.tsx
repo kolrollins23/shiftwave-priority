@@ -1,18 +1,18 @@
 import { useEffect, useState } from 'react'
 import { supabase } from './supabaseClient'
+// import {
+//   // DndContext,
+//   // closestCenter,
+//   KeyboardSensor,
+//   PointerSensor,
+//   useSensor,
+//   useSensors,
+//   DragEndEvent,
+// } from '@dnd-kit/core'
 import {
-  // DndContext,
-  // closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
-} from '@dnd-kit/core'
-import {
-  arrayMove,
+  // arrayMove,
   SortableContext,
-  sortableKeyboardCoordinates,
+  // sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import SortableItem from './SortableItem'

@@ -164,7 +164,7 @@ export default function AdminDashboard() {
                   name={entry.name}
                   score={entry.priority_score}
                   description={entry.description}
-                  onDelete={handleDelete}
+                  onDelete={handleDelete(entry.id, entry.name)}
                 />
               ))}
           </SortableContext>

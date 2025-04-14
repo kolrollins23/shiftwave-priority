@@ -42,17 +42,13 @@ export default function AdminDashboard() {
 
   // Fetch entries from Supabase
   const fetchEntries = async () => {
-    const { data, error } = await supabase
-      .from('priority_queue')
-      .select('id, name, priority_score, shipped')
-
+    const { data, error } = await supabase.from('priority_queue').select('*')
     if (error) {
       console.error('Error fetching entries:', error)
-    } else {
+    } else if (data) {
       const sorted = data.sort((a, b) => (b.priority_score || 0) - (a.priority_score || 0))
-      setEntries(sorted.filter(entry => !entry.shipped))
-      setShippedEntries(sorted.filter(entry => entry.shipped))
-
+      setEntries(sorted.filter(e => !e.shipped))
+      setShippedEntries(sorted.filter(e => e.shipped))
     }
   }
 
@@ -62,36 +58,35 @@ export default function AdminDashboard() {
 
   const sensors = useSensors(
     useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5,
+      }
     })
   )
   
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event
     if (!over) return
-  
-    const entry = entries.find((e) => e.id === active.id)
-    if (!entry) return
-  
-    if (over.id === 'trash-zone') {
-      const confirmed = window.confirm(`Are you sure you want to delete ${entry.name}?`)
-      if (confirmed) {
-        const { error } = await supabase.from('priority_queue').delete().eq('id', entry.id)
-        if (!error) setEntries(entries.filter(e => e.id !== entry.id))
-      }
-    } else if (over.id === 'shipped-zone') {
-      const confirmed = window.confirm(`Mark ${entry.name} as shipped?`)
-      if (confirmed) {
-        const { error } = await supabase.from('priority_queue').update({ shipped: true }).eq('id', entry.id)
-        if (!error) {
-          setEntries(entries.filter(e => e.id !== entry.id))
-          setShippedEntries([...shippedEntries, { ...entry, shipped: true }])
+
+    // Move to shipped column
+    if (over.id === 'shipped-drop-area') {
+      const entry = entries.find(e => e.id === active.id)
+      if (entry) {
+        const confirmed = window.confirm(`Mark ${entry.name} as shipped?`)
+        if (confirmed) {
+          const { error } = await supabase.from('priority_queue').update({ shipped: true }).eq('id', entry.id)
+          if (!error) {
+            setEntries(prev => prev.filter(e => e.id !== entry.id))
+            setShippedEntries(prev => [...prev, { ...entry, shipped: true }])
+          } else {
+            alert('Failed to mark as shipped')
+          }
         }
       }
     } else if (active.id !== over.id) {
-      const oldIndex = entries.findIndex((e) => e.id === active.id)
-      const newIndex = entries.findIndex((e) => e.id === over.id)
+      const oldIndex = entries.findIndex(e => e.id === active.id)
+      const newIndex = entries.findIndex(e => e.id === over.id)
       const newOrder = arrayMove(entries, oldIndex, newIndex)
       setEntries(newOrder)
     }
@@ -127,154 +122,63 @@ export default function AdminDashboard() {
           placeholder="Enter admin password"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          style={{
-            width: '100%',
-            padding: '0.5rem',
-            marginBottom: '1rem',
-            fontFamily: 'Times New Roman',
-          }}
           onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              handleLogin()
-            }
+            if (e.key === 'Enter') handleLogin()
           }}
+          style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem' }}
         />
-        <button
-          onClick={handleLogin}
-          style={{
-            padding: '0.5rem',
-            backgroundColor: '#007BFF',
-            color: 'white',
-            border: 'none',
-            cursor: 'pointer',
-          }}
-        >
+        <button onClick={handleLogin} style={{ padding: '0.5rem', backgroundColor: '#007BFF', color: 'white', border: 'none', cursor: 'pointer' }}>
           Login
         </button>
       </div>
     )
   }
-  
+
   return (
     <div style={{ padding: '2rem', fontFamily: 'Times New Roman' }}>
       <h1 style={{ fontWeight: 'bold', textAlign: 'center' }}>Shiftwave Admin Dashboard</h1>
-      <div style={{ display: 'flex', gap: '2rem', alignItems: 'flex-start' }}>
-        {/* Left Column */}
-        <div style={{ flex: 1 }}>
-          <h2 style={{ fontWeight: 'bold' }}>Priority Rank</h2>
-          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-            <div style={{ display: 'flex', gap: '2rem', alignItems: 'flex-start' }}>
-              {/* Left Column: Priority Rank */}
-              <div style={{ flex: 1 }}>
-                <h2 style={{ fontWeight: 'bold' }}>Priority Rank</h2>
-                <SortableContext items={entries.map((entry) => entry.id)} strategy={verticalListSortingStrategy}>
-                  {entries.map((entry) => (
-                    <SortableItem
-                      key={entry.id}
-                      id={entry.id}
-                      name={entry.name}
-                      score={entry.priority_score}
-                      description={entry.description}
-                      onDelete={handleDelete}
-                    />
-                  ))}
-                </SortableContext>
-              </div>
-
-              {/* Right Column: Shipped + Trash */}
-              <div style={{ flex: 1 }}>
-                <h2 style={{ fontWeight: 'bold', cursor: 'pointer' }} onClick={toggleShippedCollapse}>
-                  Shipped {isShippedCollapsed ? '▼' : '▲'}
-                </h2>
-                {!isShippedCollapsed && (
-                  <div>
-                    {shippedEntries.map((entry) => (
-                      <div
-                        key={entry.id}
-                        style={{
-                          padding: '0.5rem',
-                          marginBottom: '0.5rem',
-                          border: '1px solid #ccc',
-                          borderRadius: '4px',
-                          backgroundColor: '#f0fff0',
-                        }}
-                      >
-                        <strong>{entry.name}</strong> — {entry.priority_score}
-                        <p style={{ margin: '0.5rem 0', fontStyle: 'italic' }}>{entry.description}</p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* Drag Zones */}
-                <div
-                  id="shipped-zone"
-                  style={{
-                    marginTop: '2rem',
-                    padding: '1rem',
-                    border: '2px dashed green',
-                    borderRadius: '8px',
-                    textAlign: 'center',
-                    backgroundColor: '#e6ffe6',
-                    color: 'green',
-                    fontWeight: 'bold',
-                  }}
-                >
-                  Drag here to mark as shipped
-                </div>
-              </div>
-            </div>
-          </DndContext>
-
-        </div>
-  
-        {/* Right Column */}
-        <div style={{ flex: 1 }}>
-          <h2
-            style={{ fontWeight: 'bold', cursor: 'pointer' }}
-            onClick={toggleShippedCollapse}
-          >
-            Shipped {isShippedCollapsed ? '▼' : '▲'}
-          </h2>
-          {!isShippedCollapsed && (
-            <div>
-              {shippedEntries.map((entry) => (
-                <div
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <div style={{ display: 'flex', gap: '2rem', alignItems: 'flex-start' }}>
+          {/* Priority Column */}
+          <div style={{ flex: 1 }}>
+            <h2 style={{ fontWeight: 'bold' }}>Priority Rank</h2>
+            <SortableContext items={entries.map((e) => e.id)} strategy={verticalListSortingStrategy}>
+              {entries.map((entry) => (
+                <SortableItem
                   key={entry.id}
-                  style={{
-                    padding: '0.5rem',
-                    marginBottom: '0.5rem',
-                    border: '1px solid #ccc',
-                    borderRadius: '4px',
-                    backgroundColor: '#f9f9f9',
-                  }}
-                >
-                  <strong>{entry.name}</strong> — {entry.priority_score}
-                  <p style={{ margin: '0.5rem 0', fontStyle: 'italic' }}>{entry.description}</p>
-                </div>
+                  id={entry.id}
+                  name={entry.name}
+                  score={entry.priority_score}
+                  description={entry.description}
+                />
               ))}
-            </div>
-          )}
-  
-          {/* Trash Zone */}
-          <div
-            id="trash-zone"
-            style={{
-              marginTop: '2rem',
-              padding: '1rem',
-              border: '2px dashed red',
-              borderRadius: '8px',
-              textAlign: 'center',
-              backgroundColor: '#ffe5e5',
-              color: 'red',
-              fontWeight: 'bold',
-              fontFamily: 'Times New Roman',
-            }}
-          >
-            Drag here to delete
+            </SortableContext>
+          </div>
+
+          {/* Shipped Column */}
+          <div id="shipped-drop-area" style={{ flex: 1, minHeight: '300px', padding: '1rem', border: '2px dashed green', borderRadius: '10px', backgroundColor: '#e6ffe6' }}>
+            <h2 style={{ fontWeight: 'bold', cursor: 'pointer' }} onClick={toggleShippedCollapse}>
+              Shipped {isShippedCollapsed ? '▼' : '▲'}
+            </h2>
+            {!isShippedCollapsed && shippedEntries.map((entry) => (
+              <div
+                key={entry.id}
+                style={{
+                  padding: '0.5rem',
+                  marginBottom: '0.5rem',
+                  border: '1px solid #ccc',
+                  borderRadius: '4px',
+                  backgroundColor: '#f0fff0',
+                }}
+              >
+                <strong>{entry.name}</strong> — {entry.priority_score}
+                <p style={{ margin: '0.5rem 0', fontStyle: 'italic' }}>{entry.description}</p>
+              </div>
+            ))}
+            <p style={{ fontStyle: 'italic', color: 'green' }}>Drag entries here to mark as shipped</p>
           </div>
         </div>
-      </div>
+      </DndContext>
     </div>
   )
 }

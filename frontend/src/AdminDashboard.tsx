@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { supabase } from './supabaseClient'
 import {
-  DndContext,
-  closestCenter,
+  // DndContext,
+  // closestCenter,
   KeyboardSensor,
   PointerSensor,
   useSensor,
@@ -58,39 +58,39 @@ export default function AdminDashboard() {
     if (isAuthorized) fetchEntries()
   }, [isAuthorized])
 
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  )
+  // const sensors = useSensors(
+  //   useSensor(PointerSensor),
+  //   useSensor(KeyboardSensor, {
+  //     coordinateGetter: sortableKeyboardCoordinates,
+  //   })
+  // )
 
   // Handle drag-and-drop and deletion in the trash zone
-  const handleDragEnd = async (event: DragEndEvent) => {
-    const { active, over } = event
+  // const handleDragEnd = async (event: DragEndEvent) => {
+  //   const { active, over } = event
 
-    if (!over) return
+  //   if (!over) return
 
-    if (over.id === 'trash-zone') {
-      const entry = entries.find(e => e.id === active.id)
-      const confirmed = window.confirm(`Are you sure you want to delete ${entry?.name} from the priority list?`)
+  //   if (over.id === 'trash-zone') {
+  //     const entry = entries.find(e => e.id === active.id)
+  //     const confirmed = window.confirm(`Are you sure you want to delete ${entry?.name} from the priority list?`)
 
-      if (confirmed && entry) {
-        const { error } = await supabase.from('priority_queue').delete().eq('id', entry.id)
-        if (error) {
-          console.error('Error deleting entry:', error)
-          alert('Error deleting entry')
-        } else {
-          setEntries(entries.filter(e => e.id !== entry.id))
-        }
-      }
-    } else if (active.id !== over.id) {
-      const oldIndex = entries.findIndex(e => e.id === active.id)
-      const newIndex = entries.findIndex(e => e.id === over.id)
-      const newOrder = arrayMove(entries, oldIndex, newIndex)
-      setEntries(newOrder)
-    }
-  }
+  //     if (confirmed && entry) {
+  //       const { error } = await supabase.from('priority_queue').delete().eq('id', entry.id)
+  //       if (error) {
+  //         console.error('Error deleting entry:', error)
+  //         alert('Error deleting entry')
+  //       } else {
+  //         setEntries(entries.filter(e => e.id !== entry.id))
+  //       }
+  //     }
+  //   } else if (active.id !== over.id) {
+  //     const oldIndex = entries.findIndex(e => e.id === active.id)
+  //     const newIndex = entries.findIndex(e => e.id === over.id)
+  //     const newOrder = arrayMove(entries, oldIndex, newIndex)
+  //     setEntries(newOrder)
+  //   }
+  // }
   const handleDelete = async (id: string, name: string) => {
     console.log('Handle delete called')
     console.log('Deleting entry:', id, name)

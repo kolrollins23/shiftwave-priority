@@ -1,5 +1,7 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faGripLines } from '@fortawesome/free-solid-svg-icons';
 
 interface SortableItemProps {
   id: string
@@ -68,6 +70,9 @@ export default function SortableItem({
           Delete
         </button>
       )}
+      <div>
+        <FontAwesomeIcon icon={faGripLines} />
+      </div>
     </div>
   )
 }

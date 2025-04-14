@@ -3,7 +3,7 @@ import { supabase } from './supabaseClient'
 import {
   DndContext,
   closestCenter,
-  KeyboardSensor,
+  //KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
@@ -12,7 +12,7 @@ import {
 import {
   arrayMove,
   SortableContext,
-  sortableKeyboardCoordinates,
+  //sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import SortableItem from './SortableItem'
@@ -150,6 +150,7 @@ export default function AdminDashboard() {
                   name={entry.name}
                   score={entry.priority_score}
                   description={entry.description}
+                  onDelete={handleDelete}
                 />
               ))}
             </SortableContext>

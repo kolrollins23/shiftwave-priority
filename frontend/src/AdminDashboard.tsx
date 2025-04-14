@@ -91,6 +91,19 @@ export default function AdminDashboard() {
       setEntries(newOrder)
     }
   }
+  const handleDelete = async (id: string, name: string) => {
+    const confirmed = window.confirm(`Are you sure you want to delete ${name} from the priority list?`)
+    if (confirmed) {
+      const { error } = await supabase.from('priority_queue').delete().eq('id', id)
+      if (error) {
+        console.error('Error deleting entry:', error)
+        alert('Error deleting entry')
+      } else {
+        setEntries(entries.filter(e => e.id !== id))
+      }
+    }
+  }
+  
 
   // Toggle shipped items visibility
   const toggleShippedCollapse = () => {
@@ -142,7 +155,7 @@ export default function AdminDashboard() {
         <div style={{ flex: 1 }}>
           <h2 style={{ fontWeight: 'bold' }}>Priority Rank</h2>
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-            <SortableContext items={entries.map((entry) => entry.id)} strategy={verticalListSortingStrategy}>
+          <SortableContext items={entries.map((entry) => entry.id)} strategy={verticalListSortingStrategy}>
               {entries.map((entry) => (
                 <SortableItem
                   key={entry.id}
@@ -150,9 +163,11 @@ export default function AdminDashboard() {
                   name={entry.name}
                   score={entry.priority_score}
                   description={entry.description}
+                  onDelete={handleDelete}
                 />
               ))}
-            </SortableContext>
+          </SortableContext>
+
           </DndContext>
         </div>
   

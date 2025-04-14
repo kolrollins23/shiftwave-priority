@@ -74,10 +74,7 @@ export default function PrivateForm() {
         <option value="yes">Yes</option>
       </select>
       <label>Are you a celebrity?</label>
-      <select {...register('celebrity')} required>
-        <option value="no">No</option>
-        <option value="yes">Yes</option>
-      </select>
+      
       <label>Use Case:</label>
       <select {...register('use_case')} required>
         <option value="performance">Performance</option>

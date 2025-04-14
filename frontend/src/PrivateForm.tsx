@@ -1,6 +1,6 @@
 import { useForm } from 'react-hook-form'
 import { useState } from 'react'
-import { supabase } from './supabaseClient' // Ensure this import is correct
+import { supabase } from './supabaseClient'
 
 export default function PrivateForm() {
   const { register, handleSubmit } = useForm()
@@ -8,10 +8,7 @@ export default function PrivateForm() {
 
   const onSubmit = async (data: any) => {
     try {
-      console.log('Submitting form data:', data)
-
-      // Send data to your backend scoring API
-      const res = await fetch('https://shiftwave-backend.onrender.com/privatescore', {
+      const res = await fetch('https://shiftwave-backend.onrender.com/score', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
@@ -24,66 +21,108 @@ export default function PrivateForm() {
 
       const result = await res.json()
       const score = result.priority_score
-      console.log('Scored priority:', score)
 
-      // Save to Supabase with score included
       const { error } = await supabase.from('priority_queue').insert({
         ...data,
-        injured: data.injured === 'yes',
         priority_score: score,
       })
 
       if (error) {
-        console.error('Supabase insert error:', error)
         alert('Error saving to database: ' + error.message)
       } else {
         setSubmitted(true)
       }
     } catch (err) {
-      const error = err as Error // Explicitly cast to Error
-      console.error('Error submitting form:', error)
+      const error = err as Error
       alert('Failed to submit form: ' + error.message)
     }
   }
 
   if (submitted) {
-    return <h2>🎉 Thank you! Your submission has been received.</h2>
+    return <h2>🎉 Submission complete. Thank you!</h2>
   }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: 500 }}>
-      <h2>Shiftwave Intake Form</h2>
+      <h2>White Glove Intake</h2>
       <input {...register('name')} placeholder="Full Name" required />
       <input {...register('email')} placeholder="Email Address" type="email" required />
-      <label>Athlete Type:</label>
-      <select {...register('athlete_type')} required>
-        <option value="none">General Consumer</option>
-        <option value="college">College Athlete</option>
-        <option value="pro">Pro Athlete</option>
-        <option value="retired">Retired Athlete</option>
+
+      <label>Customer Type:</label>
+      <select {...register('customer_type')}>
+        <option value="">Select</option>
+        <option value="pro_athlete">Pro Athlete</option>
+        <option value="celebrity">Celebrity</option>
+        <option value="coach_trainer">Coach/Trainer</option>
+        <option value="influencer_partner">Influencer/Ambassador/Partner</option>
+        <option value="team_rep">Team or Franchise Representative</option>
+        <option value="government">Department of Defense/Government</option>
+        <option value="business_owner">Business Owner (Franchise/Training Facility)</option>
+        <option value="gifting_customer">Gifting Customer</option>
       </select>
-      <label>Season Status:</label>
-      <select {...register('season_status')} required>
+
+      <label>Current Season Status:</label>
+      <select {...register('season_status')}>
         <option value="offseason">Offseason</option>
         <option value="inseason">In Season</option>
         <option value="playoffs">Playoffs</option>
+        <option value="not_applicable">Not Applicable</option>
       </select>
-      <label>Are you currently injured?</label>
-      <select {...register('injured')} required>
+
+      <label>Injury Status:</label>
+      <select {...register('injured')}>
+        <option value="no">No</option>
+        <option value="minor">Yes – Minor</option>
+        <option value="serious">Yes – Serious</option>
+      </select>
+
+      <label>Repeat Customer?</label>
+      <select {...register('repeat_customer')}>
+        <option value="">Select...</option>
+        <option value="true">Yes</option>
+        <option value="false">No</option>
+      </select>
+
+      <label>Urgency of Need:</label>
+      <select {...register('urgency')}>
+        <option value="low">Low</option>
+        <option value="moderate">Moderate</option>
+        <option value="high">High</option>
+        <option value="code_red">Code Red/Emergency</option>
+      </select>
+
+      <label>Public Influence / Competitive Standing:</label>
+      <select {...register('public_influence')}>
+        <option value="none">No notable public presence</option>
+        <option value="moderate">Moderate (10k–100k followers)</option>
+        <option value="high">Influencer / Celebrity (less than 100k followers)</option>
+        <option value="top_100">Pro Athlete Top 100</option>
+      </select>
+
+      <label>Expected Purchase Scope:</label>
+      <select {...register('purchase_scope')}>
+        <option value="1">1 Unit</option>
+        <option value="2-5">2–5 Units</option>
+        <option value="6+">6+ Units or Franchise Order</option>
+      </select>
+
+      <label>Represents a Group or Organization?</label>
+      <select {...register('represents_group')}>
+        <option value="no">No</option>
+        <option value="team">Yes – Team or Organization</option>
+        <option value="franchise">Yes – Nationwide Franchise or Network</option>
+      </select>
+
+      <label>Is their Shiftwave system broken?</label>
+      <select {...register('system_broken')}>
+        <option value="not_applicable">Not applicable</option>
         <option value="no">No</option>
         <option value="yes">Yes</option>
       </select>
-      <label>Are you a celebrity?</label>
-      <select {...register('celebrity')} required>
-        <option value="no">No</option>
-        <option value="yes">Yes</option>
-      </select>
-      <label>Use Case:</label>
-      <select {...register('use_case')} required>
-        <option value="performance">Performance</option>
-        <option value="needs_based">Needs Based</option>
-        <option value="both">Both</option>
-      </select>
+
+      <label>Any additional notes or context?</label>
+      <textarea {...register('additional_notes')} placeholder="Add notes here" />
+
       <button type="submit">Submit</button>
     </form>
   )

@@ -92,6 +92,7 @@ export default function AdminDashboard() {
     }
   }
   const handleDelete = async (id: string, name: string) => {
+    console.log('Deleting entry:', id, name)
     const confirmed = window.confirm(`Are you sure you want to delete ${name} from the priority list?`)
     if (confirmed) {
       const { error } = await supabase.from('priority_queue').delete().eq('id', id)

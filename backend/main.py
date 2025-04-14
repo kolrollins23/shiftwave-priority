@@ -10,7 +10,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",
-        "https://shiftwavesales.vercel.app"
+        "https://shiftwavesales.vercel.app",
         "https://shiftwavesales.vercel.app/privateform"
     ],
     allow_credentials=True,

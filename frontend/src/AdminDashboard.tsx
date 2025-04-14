@@ -1,18 +1,18 @@
 import { useEffect, useState } from 'react'
 import { supabase } from './supabaseClient'
-// import {
-//   // DndContext,
-//   // closestCenter,
-//   KeyboardSensor,
-//   PointerSensor,
-//   useSensor,
-//   useSensors,
-//   DragEndEvent,
-// } from '@dnd-kit/core'
 import {
-  // arrayMove,
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core'
+import {
+  arrayMove,
   SortableContext,
-  // sortableKeyboardCoordinates,
+  sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import SortableItem from './SortableItem'
@@ -22,15 +22,15 @@ interface Entry {
   name: string
   priority_score: number
   description?: string
+  shipped?: boolean // Add the 'shipped' property
 }
 
 export default function AdminDashboard() {
   const [isAuthorized, setIsAuthorized] = useState(false)
   const [input, setInput] = useState('')
   const [entries, setEntries] = useState<Entry[]>([])
-  const [shippedEntries] = useState<Entry[]>([]) // Remove unused setShippedEntries
   const [isShippedCollapsed, setIsShippedCollapsed] = useState(false) // Collapsible state for shipped items
-
+  const [shippedEntries, setShippedEntries] = useState<Entry[]>([])
   // Login function for admin authentication
   const handleLogin = () => {
     if (input === 'shiftwave') {
@@ -44,13 +44,15 @@ export default function AdminDashboard() {
   const fetchEntries = async () => {
     const { data, error } = await supabase
       .from('priority_queue')
-      .select('id, name, priority_score')
+      .select('id, name, priority_score, shipped')
 
     if (error) {
       console.error('Error fetching entries:', error)
     } else {
       const sorted = data.sort((a, b) => (b.priority_score || 0) - (a.priority_score || 0))
-      setEntries(sorted)
+      setEntries(sorted.filter(entry => !entry.shipped))
+      setShippedEntries(sorted.filter(entry => entry.shipped))
+
     }
   }
 
@@ -58,39 +60,43 @@ export default function AdminDashboard() {
     if (isAuthorized) fetchEntries()
   }, [isAuthorized])
 
-  // const sensors = useSensors(
-  //   useSensor(PointerSensor),
-  //   useSensor(KeyboardSensor, {
-  //     coordinateGetter: sortableKeyboardCoordinates,
-  //   })
-  // )
-
-  // Handle drag-and-drop and deletion in the trash zone
-  // const handleDragEnd = async (event: DragEndEvent) => {
-  //   const { active, over } = event
-
-  //   if (!over) return
-
-  //   if (over.id === 'trash-zone') {
-  //     const entry = entries.find(e => e.id === active.id)
-  //     const confirmed = window.confirm(`Are you sure you want to delete ${entry?.name} from the priority list?`)
-
-  //     if (confirmed && entry) {
-  //       const { error } = await supabase.from('priority_queue').delete().eq('id', entry.id)
-  //       if (error) {
-  //         console.error('Error deleting entry:', error)
-  //         alert('Error deleting entry')
-  //       } else {
-  //         setEntries(entries.filter(e => e.id !== entry.id))
-  //       }
-  //     }
-  //   } else if (active.id !== over.id) {
-  //     const oldIndex = entries.findIndex(e => e.id === active.id)
-  //     const newIndex = entries.findIndex(e => e.id === over.id)
-  //     const newOrder = arrayMove(entries, oldIndex, newIndex)
-  //     setEntries(newOrder)
-  //   }
-  // }
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
+  
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event
+    if (!over) return
+  
+    const entry = entries.find((e) => e.id === active.id)
+    if (!entry) return
+  
+    if (over.id === 'trash-zone') {
+      const confirmed = window.confirm(`Are you sure you want to delete ${entry.name}?`)
+      if (confirmed) {
+        const { error } = await supabase.from('priority_queue').delete().eq('id', entry.id)
+        if (!error) setEntries(entries.filter(e => e.id !== entry.id))
+      }
+    } else if (over.id === 'shipped-zone') {
+      const confirmed = window.confirm(`Mark ${entry.name} as shipped?`)
+      if (confirmed) {
+        const { error } = await supabase.from('priority_queue').update({ shipped: true }).eq('id', entry.id)
+        if (!error) {
+          setEntries(entries.filter(e => e.id !== entry.id))
+          setShippedEntries([...shippedEntries, { ...entry, shipped: true }])
+        }
+      }
+    } else if (active.id !== over.id) {
+      const oldIndex = entries.findIndex((e) => e.id === active.id)
+      const newIndex = entries.findIndex((e) => e.id === over.id)
+      const newOrder = arrayMove(entries, oldIndex, newIndex)
+      setEntries(newOrder)
+    }
+  }
+  
   const handleDelete = async (id: string, name: string) => {
     console.log('Handle delete called')
     console.log('Deleting entry:', id, name)
@@ -156,21 +162,70 @@ export default function AdminDashboard() {
         {/* Left Column */}
         <div style={{ flex: 1 }}>
           <h2 style={{ fontWeight: 'bold' }}>Priority Rank</h2>
-          {/* <DndContext sensors={sensors} collisionDetection={closestCenter}> */}
-          <SortableContext items={entries.map((entry) => entry.id)} strategy={verticalListSortingStrategy}>
-              {entries.map((entry) => (
-                <SortableItem
-                  key={entry.id}
-                  id={entry.id}
-                  name={entry.name}
-                  score={entry.priority_score}
-                  description={entry.description}
-                  onDelete={handleDelete}
-                />
-              ))}
-          </SortableContext>
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <div style={{ display: 'flex', gap: '2rem', alignItems: 'flex-start' }}>
+              {/* Left Column: Priority Rank */}
+              <div style={{ flex: 1 }}>
+                <h2 style={{ fontWeight: 'bold' }}>Priority Rank</h2>
+                <SortableContext items={entries.map((entry) => entry.id)} strategy={verticalListSortingStrategy}>
+                  {entries.map((entry) => (
+                    <SortableItem
+                      key={entry.id}
+                      id={entry.id}
+                      name={entry.name}
+                      score={entry.priority_score}
+                      description={entry.description}
+                      onDelete={handleDelete}
+                    />
+                  ))}
+                </SortableContext>
+              </div>
 
-          {/* </DndContext> */}
+              {/* Right Column: Shipped + Trash */}
+              <div style={{ flex: 1 }}>
+                <h2 style={{ fontWeight: 'bold', cursor: 'pointer' }} onClick={toggleShippedCollapse}>
+                  Shipped {isShippedCollapsed ? '▼' : '▲'}
+                </h2>
+                {!isShippedCollapsed && (
+                  <div>
+                    {shippedEntries.map((entry) => (
+                      <div
+                        key={entry.id}
+                        style={{
+                          padding: '0.5rem',
+                          marginBottom: '0.5rem',
+                          border: '1px solid #ccc',
+                          borderRadius: '4px',
+                          backgroundColor: '#f0fff0',
+                        }}
+                      >
+                        <strong>{entry.name}</strong> — {entry.priority_score}
+                        <p style={{ margin: '0.5rem 0', fontStyle: 'italic' }}>{entry.description}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Drag Zones */}
+                <div
+                  id="shipped-zone"
+                  style={{
+                    marginTop: '2rem',
+                    padding: '1rem',
+                    border: '2px dashed green',
+                    borderRadius: '8px',
+                    textAlign: 'center',
+                    backgroundColor: '#e6ffe6',
+                    color: 'green',
+                    fontWeight: 'bold',
+                  }}
+                >
+                  Drag here to mark as shipped
+                </div>
+              </div>
+            </div>
+          </DndContext>
+
         </div>
   
         {/* Right Column */}

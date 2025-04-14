@@ -61,7 +61,7 @@ export default function SortableItem({
         <button
           style={buttonStyle}
           onClick={(e) => {
-            e.stopPropagation() // Prevent drag when clicking delete
+            // e.stopPropagation() // Prevent drag when clicking delete
             onDelete(id, name)
           }}
         >

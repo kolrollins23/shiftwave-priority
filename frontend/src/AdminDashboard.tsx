@@ -92,6 +92,7 @@ export default function AdminDashboard() {
     }
   }
   const handleDelete = async (id: string, name: string) => {
+    console.log('Handle delete called')
     console.log('Deleting entry:', id, name)
     const confirmed = window.confirm(`Are you sure you want to delete ${name} from the priority list?`)
     if (confirmed) {
@@ -164,7 +165,7 @@ export default function AdminDashboard() {
                   name={entry.name}
                   score={entry.priority_score}
                   description={entry.description}
-                  onDelete={() => handleDelete(entry.id, entry.name)}
+                  onDelete={handleDelete}
                 />
               ))}
           </SortableContext>

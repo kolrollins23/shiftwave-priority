@@ -156,7 +156,7 @@ export default function AdminDashboard() {
         {/* Left Column */}
         <div style={{ flex: 1 }}>
           <h2 style={{ fontWeight: 'bold' }}>Priority Rank</h2>
-          <DndContext sensors={sensors} collisionDetection={closestCenter}>
+          {/* <DndContext sensors={sensors} collisionDetection={closestCenter}> */}
           <SortableContext items={entries.map((entry) => entry.id)} strategy={verticalListSortingStrategy}>
               {entries.map((entry) => (
                 <SortableItem
@@ -170,7 +170,7 @@ export default function AdminDashboard() {
               ))}
           </SortableContext>
 
-          </DndContext>
+          {/* </DndContext> */}
         </div>
   
         {/* Right Column */}

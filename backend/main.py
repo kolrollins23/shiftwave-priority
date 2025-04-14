@@ -101,7 +101,8 @@ async def score(data: IntakeData):
 
     # Final score with multipliers applied
     final_score = score * season_multiplier * urgency_multiplier * broken_multiplier
-    final_score = round(final_score, 2)
+    final_score = round(final_score, 1)  # ← rounds to 1 decimal place
+    
 
     return {
         "priority_score": final_score,

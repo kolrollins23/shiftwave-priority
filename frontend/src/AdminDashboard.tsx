@@ -66,6 +66,8 @@ export default function AdminDashboard() {
   )
   
   const handleDragEnd = async (event: DragEndEvent) => {
+    console.log('Handle drag end called')
+    console.log('Drag end event:', event)
     const { active, over } = event
     if (!over) return
 

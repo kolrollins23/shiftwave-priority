@@ -166,37 +166,34 @@ export default function AdminDashboard() {
           </div>
 
           {/* Shipped Column */}
-          <div
-  ref={setShippedZoneRef}
-  id="shipped-drop-area"
-  style={{
-    flex: 1,
-    minHeight: '300px',
-    padding: '1rem',
-    border: '2px dashed green',
-    borderRadius: '10px',
-    backgroundColor: isOverShipped ? '#ccffcc' : '#e6ffe6', // This adds highlight on hover
-  }}
->            <h2 style={{ fontWeight: 'bold', cursor: 'pointer' }} onClick={toggleShippedCollapse}>
-              Shipped {isShippedCollapsed ? '▼' : '▲'}
-            </h2>
-            {!isShippedCollapsed && shippedEntries.map((entry) => (
-              <div
-                key={entry.id}
-                style={{
-                  padding: '0.5rem',
-                  marginBottom: '0.5rem',
-                  border: '1px solid #ccc',
-                  borderRadius: '4px',
-                  backgroundColor: '#f0fff0',
-                }}
-              >
-                <strong>{entry.name}</strong> — {entry.priority_score}
-                <p style={{ margin: '0.5rem 0', fontStyle: 'italic' }}>{entry.description}</p>
-              </div>
-            ))}
-            <p style={{ fontStyle: 'italic', color: 'green' }}>Drag entries here to mark as shipped</p>
-          </div>
+          <SortableContext items={shippedEntries.map((e) => e.id)} strategy={verticalListSortingStrategy}>
+  <div
+    ref={setShippedZoneRef}
+    id="shipped-drop-area"
+    style={{
+      flex: 1,
+      minHeight: '300px',
+      padding: '1rem',
+      border: '2px dashed green',
+      borderRadius: '10px',
+      backgroundColor: isOverShipped ? '#ccffcc' : '#e6ffe6',
+    }}
+  >
+    <h2 style={{ fontWeight: 'bold', cursor: 'pointer' }} onClick={toggleShippedCollapse}>
+      Shipped {isShippedCollapsed ? '▼' : '▲'}
+    </h2>
+    {!isShippedCollapsed && shippedEntries.map((entry) => (
+      <SortableItem
+        key={entry.id}
+        id={entry.id}
+        name={entry.name}
+        score={entry.priority_score}
+        description={entry.description}
+      />
+    ))}
+    <p style={{ fontStyle: 'italic', color: 'green' }}>Drag entries here to mark as shipped</p>
+  </div>
+</SortableContext>
         </div>
       </DndContext>
     </div>

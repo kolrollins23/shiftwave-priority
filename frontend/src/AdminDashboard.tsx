@@ -3,7 +3,6 @@ import { supabase } from './supabaseClient'
 import {
   DndContext,
   closestCenter,
-  //KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
@@ -13,32 +12,29 @@ import {
 import {
   arrayMove,
   SortableContext,
-  //sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import SortableItem from './SortableItem'
-
 
 interface Entry {
   id: string
   name: string
   priority_score: number
   description?: string
-  shipped?: boolean // Add the 'shipped' property
+  shipped?: boolean
 }
 
 export default function AdminDashboard() {
   const [isAuthorized, setIsAuthorized] = useState(false)
   const [input, setInput] = useState('')
   const [entries, setEntries] = useState<Entry[]>([])
-  const [isShippedCollapsed, setIsShippedCollapsed] = useState(false) // Collapsible state for shipped items
+  const [isShippedCollapsed, setIsShippedCollapsed] = useState(false)
   const [shippedEntries, setShippedEntries] = useState<Entry[]>([])
-  
-  const { setNodeRef: setShippedZoneRef, isOver: isOverShipped } = useDroppable({
+
+  const { setNodeRef: setShippedZoneRef } = useDroppable({
     id: 'shipped-drop-area',
   })
-  
-  // Login function for admin authentication
+
   const handleLogin = () => {
     if (input === 'shiftwave') {
       setIsAuthorized(true)
@@ -47,7 +43,6 @@ export default function AdminDashboard() {
     }
   }
 
-  // Fetch entries from Supabase
   const fetchEntries = async () => {
     const { data, error } = await supabase.from('priority_queue').select('*')
     if (error) {
@@ -71,22 +66,16 @@ export default function AdminDashboard() {
       }
     })
   )
-  
+
   const handleDragEnd = async (event: DragEndEvent) => {
-    console.log('Handle drag end called')
-    console.log('Drag end event:', event)
     const { active, over } = event
     if (!over) return
 
     const isOverShippedColumn = shippedEntries.some(entry => entry.id === over?.id)
 
-    // Move to shipped column
     if (isOverShippedColumn || over?.id === 'shipped-drop-area') {
-      console.log("trying to find matching entry")
       const entry = entries.find(e => e.id === active.id)
-      console.log("entry was found!")
       if (entry) {
-        console.log("entry has been found")
         const confirmed = window.confirm(`Mark ${entry.name} as shipped?`)
         if (confirmed) {
           const { error } = await supabase.from('priority_queue').update({ shipped: true }).eq('id', entry.id)
@@ -105,10 +94,8 @@ export default function AdminDashboard() {
       setEntries(newOrder)
     }
   }
-  
+
   const handleDelete = async (id: string, name: string) => {
-    console.log('Handle delete called')
-    console.log('Deleting entry:', id, name)
     const confirmed = window.confirm(`Are you sure you want to delete ${name} from the priority list?`)
     if (confirmed) {
       const { error } = await supabase.from('priority_queue').delete().eq('id', id)
@@ -120,9 +107,7 @@ export default function AdminDashboard() {
       }
     }
   }
-  
 
-  // Toggle shipped items visibility
   const toggleShippedCollapse = () => {
     setIsShippedCollapsed(!isShippedCollapsed)
   }
@@ -172,33 +157,29 @@ export default function AdminDashboard() {
 
           {/* Shipped Column */}
           <SortableContext items={shippedEntries.map((e) => e.id)} strategy={verticalListSortingStrategy}>
-  <div
-    ref={setShippedZoneRef}
-    id="shipped-drop-area"
-    style={{
-      flex: 1,
-      minHeight: '300px',
-      padding: '1rem',
-      border: '2px dashed green',
-      borderRadius: '10px',
-      backgroundColor: isOverShipped ? '#ccffcc' : '#e6ffe6',
-    }}
-  >
-    <h2 style={{ fontWeight: 'bold', cursor: 'pointer' }} onClick={toggleShippedCollapse}>
-      Shipped {isShippedCollapsed ? '▼' : '▲'}
-    </h2>
-    {!isShippedCollapsed && shippedEntries.map((entry) => (
-      <SortableItem
-        key={entry.id}
-        id={entry.id}
-        name={entry.name}
-        score={entry.priority_score}
-        description={entry.description}
-      />
-    ))}
-    <p style={{ fontStyle: 'italic', color: 'green' }}>Drag entries here to mark as shipped</p>
-  </div>
-</SortableContext>
+            <div
+              ref={setShippedZoneRef}
+              id="shipped-drop-area"
+              style={{
+                flex: 1,
+                minHeight: '300px',
+                padding: '1rem',
+              }}
+            >
+              <h2 style={{ fontWeight: 'bold', cursor: 'pointer' }} onClick={toggleShippedCollapse}>
+                Shipped {isShippedCollapsed ? '▼' : '▲'}
+              </h2>
+              {!isShippedCollapsed && shippedEntries.map((entry) => (
+                <SortableItem
+                  key={entry.id}
+                  id={entry.id}
+                  name={entry.name}
+                  score={entry.priority_score}
+                  description={entry.description}
+                />
+              ))}
+            </div>
+          </SortableContext>
         </div>
       </DndContext>
     </div>

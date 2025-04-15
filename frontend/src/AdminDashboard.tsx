@@ -8,6 +8,7 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
+  useDroppable,
 } from '@dnd-kit/core'
 import {
   arrayMove,
@@ -16,6 +17,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import SortableItem from './SortableItem'
+
 
 interface Entry {
   id: string
@@ -31,6 +33,11 @@ export default function AdminDashboard() {
   const [entries, setEntries] = useState<Entry[]>([])
   const [isShippedCollapsed, setIsShippedCollapsed] = useState(false) // Collapsible state for shipped items
   const [shippedEntries, setShippedEntries] = useState<Entry[]>([])
+  
+  const { setNodeRef: setShippedZoneRef, isOver: isOverShipped } = useDroppable({
+    id: 'shipped-drop-area',
+  })
+  
   // Login function for admin authentication
   const handleLogin = () => {
     if (input === 'shiftwave') {
@@ -159,8 +166,18 @@ export default function AdminDashboard() {
           </div>
 
           {/* Shipped Column */}
-          <div id="shipped-drop-area" style={{ flex: 1, minHeight: '300px', padding: '1rem', border: '2px dashed green', borderRadius: '10px', backgroundColor: '#e6ffe6' }}>
-            <h2 style={{ fontWeight: 'bold', cursor: 'pointer' }} onClick={toggleShippedCollapse}>
+          <div
+  ref={setShippedZoneRef}
+  id="shipped-drop-area"
+  style={{
+    flex: 1,
+    minHeight: '300px',
+    padding: '1rem',
+    border: '2px dashed green',
+    borderRadius: '10px',
+    backgroundColor: isOverShipped ? '#ccffcc' : '#e6ffe6', // This adds highlight on hover
+  }}
+>            <h2 style={{ fontWeight: 'bold', cursor: 'pointer' }} onClick={toggleShippedCollapse}>
               Shipped {isShippedCollapsed ? '▼' : '▲'}
             </h2>
             {!isShippedCollapsed && shippedEntries.map((entry) => (

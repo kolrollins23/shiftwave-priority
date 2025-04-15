@@ -15,6 +15,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import SortableItem from './SortableItem'
+import logo from './assets/shiftwave-logo.png' // Make sure to place the logo file in /src/assets/
 
 interface Entry {
   id: string
@@ -114,8 +115,9 @@ export default function AdminDashboard() {
 
   if (!isAuthorized) {
     return (
-      <div style={{ padding: '2rem', maxWidth: '400px', margin: '0 auto' }}>
-        <h2 style={{ fontFamily: 'Times New Roman', fontWeight: 'bold' }}>Shiftwave Admin Login</h2>
+      <div style={{ padding: '2rem', maxWidth: '400px', margin: '0 auto', fontFamily: 'Inter, sans-serif' }}>
+        <img src={logo} alt="Shiftwave Logo" style={{ height: '40px', marginBottom: '1rem' }} />
+        <h2 style={{ fontWeight: '600', color: '#0D1B2A' }}>Shiftwave Admin Login</h2>
         <input
           type="password"
           placeholder="Enter admin password"
@@ -124,9 +126,9 @@ export default function AdminDashboard() {
           onKeyDown={(e) => {
             if (e.key === 'Enter') handleLogin()
           }}
-          style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem' }}
+          style={{ width: '100%', padding: '0.5rem', marginBottom: '1rem', borderRadius: '6px', border: '1px solid #ccc' }}
         />
-        <button onClick={handleLogin} style={{ padding: '0.5rem', backgroundColor: '#007BFF', color: 'white', border: 'none', cursor: 'pointer' }}>
+        <button onClick={handleLogin} style={{ padding: '0.5rem', backgroundColor: '#20B486', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>
           Login
         </button>
       </div>
@@ -134,13 +136,16 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div style={{ padding: '2rem', fontFamily: 'Times New Roman' }}>
-      <h1 style={{ fontWeight: 'bold', textAlign: 'center' }}>Shiftwave Admin Dashboard</h1>
+    <div style={{ padding: '2rem', fontFamily: 'Inter, sans-serif', backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+        <img src={logo} alt="Shiftwave Logo" style={{ height: '40px' }} />
+        <h1 style={{ fontWeight: '700', fontSize: '1.75rem', color: '#0D1B2A' }}>Shiftwave Admin Dashboard</h1>
+      </div>
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <div style={{ display: 'flex', gap: '2rem', alignItems: 'flex-start' }}>
           {/* Priority Column */}
           <div style={{ flex: 1 }}>
-            <h2 style={{ fontWeight: 'bold' }}>Priority Rank</h2>
+            <h2 style={{ fontWeight: '600', color: '#0D1B2A' }}>Priority Rank</h2>
             <SortableContext items={entries.map((e) => e.id)} strategy={verticalListSortingStrategy}>
               {entries.map((entry) => (
                 <SortableItem
@@ -160,13 +165,9 @@ export default function AdminDashboard() {
             <div
               ref={setShippedZoneRef}
               id="shipped-drop-area"
-              style={{
-                flex: 1,
-                minHeight: '300px',
-                padding: '1rem',
-              }}
+              style={{ flex: 1, minHeight: '300px', padding: '1rem' }}
             >
-              <h2 style={{ fontWeight: 'bold', cursor: 'pointer' }} onClick={toggleShippedCollapse}>
+              <h2 style={{ fontWeight: '600', color: '#0D1B2A', cursor: 'pointer' }} onClick={toggleShippedCollapse}>
                 Shipped {isShippedCollapsed ? '▼' : '▲'}
               </h2>
               {!isShippedCollapsed && shippedEntries.map((entry) => (

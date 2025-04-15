@@ -45,7 +45,9 @@ export default function PrivateForm() {
 
   return (
     <div style={{ fontFamily: 'Inter, sans-serif', backgroundColor: '#f8f9fa', minHeight: '100vh', padding: '2rem' }}>
-      <img src={logo} alt="Shiftwave Logo" style={{ height: '40px', marginBottom: '1rem' }} />
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '2rem' }}>
+        <img src={logo} alt="Shiftwave Logo" style={{ height: '200px' }} />
+      </div>
       <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: 500, margin: '0 auto', backgroundColor: 'white', padding: '2rem', borderRadius: '10px', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)' }}>
         <h2 style={{ fontWeight: 600, color: '#0D1B2A' }}>Shiftwave Employee-Guided Customer Information Form</h2>
         <input {...register('name')} placeholder="Full Name" required style={inputStyle} />

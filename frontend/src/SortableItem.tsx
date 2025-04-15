@@ -202,9 +202,6 @@ export default function SortableItem({
           Delete
         </button>
       )}
-      <div>
-        <FontAwesomeIcon icon={faGripLines} />
-      </div>
       <button
         style={{
           marginTop: '10px',

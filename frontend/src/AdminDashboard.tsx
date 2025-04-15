@@ -82,6 +82,7 @@ export default function AdminDashboard() {
     if (over.id === 'shipped-drop-area') {
       const entry = entries.find(e => e.id === active.id)
       if (entry) {
+        console.log("entry has been found")
         const confirmed = window.confirm(`Mark ${entry.name} as shipped?`)
         if (confirmed) {
           const { error } = await supabase.from('priority_queue').update({ shipped: true }).eq('id', entry.id)

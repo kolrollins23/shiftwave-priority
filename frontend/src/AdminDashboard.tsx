@@ -80,7 +80,9 @@ export default function AdminDashboard() {
 
     // Move to shipped column
     if (over.id === 'shipped-drop-area') {
+      console.log("trying to find matching entry")
       const entry = entries.find(e => e.id === active.id)
+      console.log("entry was found!")
       if (entry) {
         console.log("entry has been found")
         const confirmed = window.confirm(`Mark ${entry.name} as shipped?`)

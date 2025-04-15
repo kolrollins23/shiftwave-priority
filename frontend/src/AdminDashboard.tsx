@@ -76,10 +76,11 @@ export default function AdminDashboard() {
     console.log('Handle drag end called')
     console.log('Drag end event:', event)
     const { active, over } = event
+    const isOverShippedColumn = shippedEntries.some(entry => entry.id === over?.id)
     if (!over) return
 
     // Move to shipped column
-    if (over.id === 'shipped-drop-area') {
+    if (isOverShippedColumn || over?.id === 'shipped-drop-area') {
       console.log("trying to find matching entry")
       const entry = entries.find(e => e.id === active.id)
       console.log("entry was found!")

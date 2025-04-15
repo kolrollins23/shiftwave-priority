@@ -71,24 +71,25 @@ export default function AdminDashboard() {
       }
     })
   )
-  
-  const handleDragEnd = async (event: DragEndEvent) => {
-    console.log('Handle drag end called')
-    console.log('Drag end event:', event)
-    const { active, over } = event
-    const isOverShippedColumn = shippedEntries.some(entry => entry.id === over?.id)
-    if (!over) return
 
-    // Move to shipped column
-    if (isOverShippedColumn || over?.id === 'shipped-drop-area') {
-      console.log("trying to find matching entry")
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event
+    if (!over) return
+  
+    // Use containerId to determine which list it's dropped into
+    const overContainerId = over?.data?.current?.sortable?.containerId
+    const isDroppedIntoShipped = overContainerId === 'shipped-drop-area'
+  
+    if (isDroppedIntoShipped) {
       const entry = entries.find(e => e.id === active.id)
-      console.log("entry was found!")
       if (entry) {
-        console.log("entry has been found")
         const confirmed = window.confirm(`Mark ${entry.name} as shipped?`)
         if (confirmed) {
-          const { error } = await supabase.from('priority_queue').update({ shipped: true }).eq('id', entry.id)
+          const { error } = await supabase
+            .from('priority_queue')
+            .update({ shipped: true })
+            .eq('id', entry.id)
+  
           if (!error) {
             setEntries(prev => prev.filter(e => e.id !== entry.id))
             setShippedEntries(prev => [...prev, { ...entry, shipped: true }])
@@ -97,13 +98,49 @@ export default function AdminDashboard() {
           }
         }
       }
-    } else if (active.id !== over.id) {
+    } else {
       const oldIndex = entries.findIndex(e => e.id === active.id)
       const newIndex = entries.findIndex(e => e.id === over.id)
-      const newOrder = arrayMove(entries, oldIndex, newIndex)
-      setEntries(newOrder)
+      if (oldIndex !== -1 && newIndex !== -1) {
+        const newOrder = arrayMove(entries, oldIndex, newIndex)
+        setEntries(newOrder)
+      }
     }
   }
+  
+  // const handleDragEnd = async (event: DragEndEvent) => {
+  //   console.log('Handle drag end called')
+  //   console.log('Drag end event:', event)
+  //   const { active, over } = event
+  //   if (!over) return
+
+  //   const isOverShippedColumn = shippedEntries.some(entry => entry.id === over?.id)
+
+  //   // Move to shipped column
+  //   if (isOverShippedColumn || over?.id === 'shipped-drop-area') {
+  //     console.log("trying to find matching entry")
+  //     const entry = entries.find(e => e.id === active.id)
+  //     console.log("entry was found!")
+  //     if (entry) {
+  //       console.log("entry has been found")
+  //       const confirmed = window.confirm(`Mark ${entry.name} as shipped?`)
+  //       if (confirmed) {
+  //         const { error } = await supabase.from('priority_queue').update({ shipped: true }).eq('id', entry.id)
+  //         if (!error) {
+  //           setEntries(prev => prev.filter(e => e.id !== entry.id))
+  //           setShippedEntries(prev => [...prev, { ...entry, shipped: true }])
+  //         } else {
+  //           alert('Failed to mark as shipped')
+  //         }
+  //       }
+  //     }
+  //   } else if (active.id !== over.id) {
+  //     const oldIndex = entries.findIndex(e => e.id === active.id)
+  //     const newIndex = entries.findIndex(e => e.id === over.id)
+  //     const newOrder = arrayMove(entries, oldIndex, newIndex)
+  //     setEntries(newOrder)
+  //   }
+  // }
   
   const handleDelete = async (id: string, name: string) => {
     console.log('Handle delete called')

@@ -143,9 +143,9 @@ export default function AdminDashboard() {
       </div>
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '2rem', alignItems: 'flex-start', maxWidth: '1200px', width: '100%' }}>
+          <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '2rem', alignItems: 'flex-start', width: '100%', padding: '0 2rem' }}>
             {/* Priority Column */}
-            <div style={{ flex: 1, minWidth: '280px' }}>
+            <div style={{ flex: 1, minWidth: '320px' }}>
               <h2 style={{ fontWeight: '600', color: '#0D1B2A' }}>Priority Rank</h2>
               <SortableContext items={entries.map((e) => e.id)} strategy={verticalListSortingStrategy}>
                 {entries.map((entry) => (
@@ -166,7 +166,7 @@ export default function AdminDashboard() {
               <div
                 ref={setShippedZoneRef}
                 id="shipped-drop-area"
-                style={{ flex: 1, minWidth: '280px', minHeight: '300px', padding: '1rem' }}
+                style={{ flex: 1, minWidth: '320px', minHeight: '300px', padding: '1rem' }}
               >
                 <h2 style={{ fontWeight: '600', color: '#0D1B2A', cursor: 'pointer' }} onClick={toggleShippedCollapse}>
                   Shipped {isShippedCollapsed ? '▼' : '▲'}

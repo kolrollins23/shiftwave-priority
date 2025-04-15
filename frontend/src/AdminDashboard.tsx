@@ -15,7 +15,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import SortableItem from './SortableItem'
-import logo from './assets/shiftwave-logo.png' // Make sure to place the logo file in /src/assets/
+import logo from './assets/shiftwave-logo.png'
 
 interface Entry {
   id: string
@@ -142,45 +142,47 @@ export default function AdminDashboard() {
         <h1 style={{ fontWeight: '700', fontSize: '1.75rem', color: '#0D1B2A' }}>Shiftwave Admin Dashboard</h1>
       </div>
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-        <div style={{ display: 'flex', gap: '2rem', alignItems: 'flex-start' }}>
-          {/* Priority Column */}
-          <div style={{ flex: 1 }}>
-            <h2 style={{ fontWeight: '600', color: '#0D1B2A' }}>Priority Rank</h2>
-            <SortableContext items={entries.map((e) => e.id)} strategy={verticalListSortingStrategy}>
-              {entries.map((entry) => (
-                <SortableItem
-                  key={entry.id}
-                  id={entry.id}
-                  name={entry.name}
-                  score={entry.priority_score}
-                  description={entry.description}
-                  onDelete={handleDelete}
-                />
-              ))}
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', gap: '2rem', alignItems: 'flex-start', maxWidth: '1200px', width: '100%' }}>
+            {/* Priority Column */}
+            <div style={{ flex: 1, minWidth: '280px' }}>
+              <h2 style={{ fontWeight: '600', color: '#0D1B2A' }}>Priority Rank</h2>
+              <SortableContext items={entries.map((e) => e.id)} strategy={verticalListSortingStrategy}>
+                {entries.map((entry) => (
+                  <SortableItem
+                    key={entry.id}
+                    id={entry.id}
+                    name={entry.name}
+                    score={entry.priority_score}
+                    description={entry.description}
+                    onDelete={handleDelete}
+                  />
+                ))}
+              </SortableContext>
+            </div>
+
+            {/* Shipped Column */}
+            <SortableContext items={shippedEntries.map((e) => e.id)} strategy={verticalListSortingStrategy}>
+              <div
+                ref={setShippedZoneRef}
+                id="shipped-drop-area"
+                style={{ flex: 1, minWidth: '280px', minHeight: '300px', padding: '1rem' }}
+              >
+                <h2 style={{ fontWeight: '600', color: '#0D1B2A', cursor: 'pointer' }} onClick={toggleShippedCollapse}>
+                  Shipped {isShippedCollapsed ? '▼' : '▲'}
+                </h2>
+                {!isShippedCollapsed && shippedEntries.map((entry) => (
+                  <SortableItem
+                    key={entry.id}
+                    id={entry.id}
+                    name={entry.name}
+                    score={entry.priority_score}
+                    description={entry.description}
+                  />
+                ))}
+              </div>
             </SortableContext>
           </div>
-
-          {/* Shipped Column */}
-          <SortableContext items={shippedEntries.map((e) => e.id)} strategy={verticalListSortingStrategy}>
-            <div
-              ref={setShippedZoneRef}
-              id="shipped-drop-area"
-              style={{ flex: 1, minHeight: '300px', padding: '1rem' }}
-            >
-              <h2 style={{ fontWeight: '600', color: '#0D1B2A', cursor: 'pointer' }} onClick={toggleShippedCollapse}>
-                Shipped {isShippedCollapsed ? '▼' : '▲'}
-              </h2>
-              {!isShippedCollapsed && shippedEntries.map((entry) => (
-                <SortableItem
-                  key={entry.id}
-                  id={entry.id}
-                  name={entry.name}
-                  score={entry.priority_score}
-                  description={entry.description}
-                />
-              ))}
-            </div>
-          </SortableContext>
         </div>
       </DndContext>
     </div>

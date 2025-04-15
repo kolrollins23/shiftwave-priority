@@ -105,8 +105,6 @@
 
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGripLines } from '@fortawesome/free-solid-svg-icons';
 import { supabase } from './supabaseClient';
 import { useState, useEffect } from 'react';
 

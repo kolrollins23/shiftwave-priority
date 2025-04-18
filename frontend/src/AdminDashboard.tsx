@@ -50,7 +50,32 @@ export default function AdminDashboard() {
       console.error('Error fetching entries:', error)
     } else if (data) {
       const sorted = data.sort((a, b) => (b.priority_score || 0) - (a.priority_score || 0))
-      setEntries(sorted.filter(e => !e.shipped))
+      const formatDescription = (entry: any) => {
+        return [
+          `Athlete Type: ${entry.athlete_type ?? 'N/A'}`,
+          `Season Status: ${entry.season_status ?? 'N/A'}`,
+          `Injury: ${entry.injured ?? 'N/A'}`,
+          `Use Case: ${entry.use_case ?? 'N/A'}`,
+          `Referral: ${entry.referral_source ?? 'N/A'}`,
+          `Repeat Customer: ${entry.repeat_customer ? 'Yes' : 'No'}`,
+          `Public Influence: ${entry.public_influence ?? 'N/A'}`,
+          `Urgency: ${entry.urgency ?? 'N/A'}`,
+          `Purchase Scope: ${entry.purchase_scope ?? 'N/A'}`,
+          `Represents Group: ${entry.represents_group ?? 'N/A'}`,
+          `System Broken: ${entry.system_broken ?? 'N/A'}`,
+          `Customer Type: ${entry.customer_type ?? 'N/A'}`,
+          `Notes: ${entry.additional_notes ?? 'N/A'}`
+        ].join('\n')
+      }
+      
+      const enhanced = sorted.map((entry) => ({
+        ...entry,
+        description: formatDescription(entry)
+      }))
+      
+      setEntries(enhanced.filter(e => !e.shipped))
+      setShippedEntries(enhanced.filter(e => e.shipped))
+      
       setShippedEntries(sorted.filter(e => e.shipped))
     }
   }
